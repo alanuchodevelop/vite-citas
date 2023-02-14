@@ -1,6 +1,8 @@
 import {useEffect, useState} from "react";
+// componete de error
+import Error from './Error';
 
-function Formulario() {
+function Formulario({pacientes, setPacientes}) {
 
     const [nombre, setNombre] = useState('');
     const [propietario, setPropietario] = useState('');
@@ -9,16 +11,38 @@ function Formulario() {
     const [sintomas, setSintomas] = useState('');
 
     const [error, setError] = useState(false);
-    const handleSubmit = (e) => {
 
+    const generarId = () => {
+        const random = Math.random().toString(36).substring(2);
+        const fecha  =  Date.now().toString(36);
+        return random + fecha;
+    };
+    const handleSubmit = (e) => {
         e.preventDefault();
         // validacion del formulario
         if ([nombre, propietario, email, fecha, sintomas].includes('')) {
-            console.log('hay campos vacioes')
             setError(true)
         } else {
-            console.log('todo bien')
             setError(false)
+
+            // objeto para guardar la moscota paciente
+            const objetoPaciente = [{
+                nombre,
+                propietario,
+                email,
+                fecha,
+                sintomas,
+                id: generarId()
+            }];
+            // se pasa una copia del arreglo
+            setPacientes([...pacientes, objetoPaciente]);
+
+            // reincio de formulario
+            setNombre('');
+            setPropietario('');
+            setEmail('');
+            setFecha('');
+            setSintomas('');
         }
     }
 
@@ -31,9 +55,8 @@ function Formulario() {
                 <span className="text-indigo-600">Administralos</span>
             </p>
             <form className="bg-white shadow-md rounded-lg py-10 px-5" onSubmit={handleSubmit}>
-                {error && (<div className="bg-red-700 text-white p-3 uppercase text-center rounded">
-                    <p>Hay un error</p>
-                </div>)}
+
+                {error && <Error mensaje='Todos los campos son obligatorios' />}
                 <div className="mb-5">
                     <label htmlFor="mascota" className="block text-gray-700 uppercase font-bold">Nombre Mascota</label>
                     <input type="text"
@@ -55,8 +78,8 @@ function Formulario() {
                            className="border-2 w-full p-2 mt-2 placeholder-gray-400 rounded"/>
                 </div>
                 <div className="mb-5">
-                    <label htmlFor="email" className="block text-gray-700 uppercase font-bold">Nombre
-                        Propietario</label>
+                    <label htmlFor="email" className="block text-gray-700 uppercase font-bold">
+                        Email</label>
                     <input type="text"
                            id="email"
                            placeholder="Ingresar email"
